@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Transaction Report</title>
+    <style>
+        /* CSS content will be in separate file */
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Vehicle Transaction Report</h1>
+        
+        <!-- Loading indicator -->
+        <div id="loadingIndicator" class="loading-indicator">
+            <div class="spinner"></div>
+            <p>Loading vehicle data from Server...</p>
+        </div>
+        
+        <div class="filters" style="display: none;">
+            <div class="filter-group">
+                <label for="vehicleNumber">Vehicle Number:</label>
+                <input type="text" id="vehicleNumber" placeholder="Enter vehicle number" list="vehicleNumbers">
+                <button id="searchBtn">Search</button>
+                <button id="printBtn">Print Report</button>
+            </div>
+            
+            <div class="filter-group">
+                <label for="yearFilter">Filter by Year:</label>
+                <select id="yearFilter">
+                    <option value="">All Years</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="descriptionFilter">Filter by Description:</label>
+                <input type="text" id="descriptionFilter" placeholder="Enter description">
+                <button id="clearDescriptionBtn">Clear</button>
+            </div>
+        </div>
+        
+        <div class="results" style="display: none;">
+            <div class="summary">
+                <h2>Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span>Total Transactions:</span>
+                        <span id="totalTransactions">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Amount:</span>
+                        <span id="totalAmount">0.00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Opening Value (1999-2024):</span>
+                        <span id="openingValue">0.00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Closing Value (All Years):</span>
+                        <span id="closingValue">0.00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>PO Number</th>
+                        <th>Site</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script>
+        // JavaScript content will be in separate file
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
