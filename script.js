@@ -6,49 +6,43 @@ let closingValue = 0;
 let currentVehicleNumber = '';
 
 // DOM elements
+const loadingIndicator = document.getElementById('loadingIndicator');
 const filtersSection = document.querySelector('.filters');
+const resultsSection = document.querySelector('.results');
 const vehicleNumberInput = document.getElementById('vehicleNumber');
 const searchBtn = document.getElementById('searchBtn');
 const printBtn = document.getElementById('printBtn');
 const yearFilter = document.getElementById('yearFilter');
 const descriptionFilter = document.getElementById('descriptionFilter');
-const clearDescriptionBtn = document.getElementById('clearDescriptionBtn');
+const clearBtn = document.getElementById('clearBtn');
 const resultsTable = document.getElementById('resultsTable').getElementsByTagName('tbody')[0];
 const totalTransactionsSpan = document.getElementById('totalTransactions');
 const totalAmountSpan = document.getElementById('totalAmount');
 const openingValueSpan = document.getElementById('openingValue');
 const closingValueSpan = document.getElementById('closingValue');
-const loadingIndicator = document.getElementById('loadingIndicator');
-const resultsSection = document.querySelector('.results');
 
 // Initialize the application
 function init() {
-    // Set up event listeners
+    setupEventListeners();
+    loadCSVFromURL();
+}
+
+function setupEventListeners() {
     searchBtn.addEventListener('click', searchTransactions);
     printBtn.addEventListener('click', printReport);
     yearFilter.addEventListener('change', filterResults);
     descriptionFilter.addEventListener('input', filterResults);
-    clearDescriptionBtn.addEventListener('click', () => {
-        descriptionFilter.value = '';
-        filterResults();
-    });
+    clearBtn.addEventListener('click', clearFilters);
     
     vehicleNumberInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            searchTransactions();
-        }
+        if (e.key === 'Enter') searchTransactions();
     });
-    
-    // Automatically load data from GitHub
-    loadCSVFromURL();
 }
 
-// Format number as financial (no currency symbol)
 function formatFinancial(num) {
     return parseFloat(num || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-// Load and parse CSV from GitHub URL
 function loadCSVFromURL() {
     const url = "https://raw.githubusercontent.com/DC-database/Invoice/main/Vehicle.csv";
     
@@ -59,21 +53,15 @@ function loadCSVFromURL() {
             allData = results.data.filter(row => row['Year']);
             processData(allData);
             
-            // Show UI components
             filtersSection.style.display = 'block';
             resultsSection.style.display = 'block';
-            
-            // Hide loading indicator
             loadingIndicator.style.display = 'none';
-            
-            console.log(`Data loaded successfully from GitHub! Found ${vehicleDataMap.size} unique vehicle numbers`);
         },
         error: function(error) {
-            console.error('Error loading CSV from GitHub:', error);
+            console.error('Error loading CSV:', error);
             loadingIndicator.innerHTML = `
                 <div style="color: red; padding: 20px;">
-                    <p>Error loading data from GitHub</p>
-                    <p>${error.message || 'Please check console for details'}</p>
+                    <p>Error loading data</p>
                     <button onclick="location.reload()">Retry</button>
                 </div>
             `;
@@ -81,14 +69,10 @@ function loadCSVFromURL() {
     });
 }
 
-// Process the parsed data and create vehicle number mapping
 function processData(data) {
     vehicleDataMap.clear();
-    
-    if (data.length === 0) return;
-    
-    const headers = Object.keys(data[0]);
-    
+    if (!data.length) return;
+
     const knownVehicleNumbers = [
         "4735", "4896", "13890", "17745", "24004", "29391", "31062", "31107", "32218", 
         "33930", "34026", "35237", "36588", "37481", "37510", "47054", "47055", "47524", 
@@ -101,18 +85,8 @@ function processData(data) {
         "925770", "102095", "173492", "78209", "195891", "220266", "78409", "174186", 
         "698271", "H281840-37510", "H281839-37481", "H145759-13890", "281840", "238184"
     ];
-    
-    const vehicleNumberColumns = [];
-    headers.forEach((header, index) => {
-        const cleanHeader = header.trim();
-        if (knownVehicleNumbers.includes(cleanHeader)) {
-            vehicleNumberColumns.push({
-                index: index,
-                vehicleNumber: cleanHeader
-            });
-        }
-    });
-    
+
+    // Process data and populate vehicleDataMap
     data.forEach(row => {
         const transaction = {
             year: row['Year'],
@@ -122,218 +96,154 @@ function processData(data) {
             amount: row['Delivered Amount']
         };
         
-        vehicleNumberColumns.forEach(col => {
-            const vehicleNumber = col.vehicleNumber;
-            const columnName = headers[col.index];
-            
-            if (row[columnName] && row[columnName].trim() !== '') {
-                if (!vehicleDataMap.has(vehicleNumber)) {
-                    vehicleDataMap.set(vehicleNumber, []);
+        knownVehicleNumbers.forEach(num => {
+            if (row[num] && row[num].trim() !== '') {
+                if (!vehicleDataMap.has(num)) {
+                    vehicleDataMap.set(num, []);
                 }
-                vehicleDataMap.get(vehicleNumber).push(transaction);
+                vehicleDataMap.get(num).push(transaction);
             }
         });
     });
-    
-    // Populate year filter
-    const years = new Set();
-    data.forEach(row => {
-        if (row['Year']) years.add(row['Year']);
-    });
+
+    // Populate year filter and datalist
+    populateYearFilter(data);
+    populateVehicleDatalist();
+}
+
+function populateYearFilter(data) {
+    const years = [...new Set(data.map(row => row['Year']).filter(Boolean))].sort();
     yearFilter.innerHTML = '<option value="">All Years</option>';
-    Array.from(years).sort().forEach(year => {
+    years.forEach(year => {
         const option = document.createElement('option');
         option.value = year;
         option.textContent = year;
         yearFilter.appendChild(option);
     });
-    
-    // Create vehicle number datalist
-    const vehicleNumbers = Array.from(vehicleDataMap.keys()).sort();
-    const datalist = document.createElement('datalist');
-    datalist.id = 'vehicleNumbers';
-    vehicleNumbers.forEach(num => {
+}
+
+function populateVehicleDatalist() {
+    const datalist = document.getElementById('vehicleNumbers');
+    datalist.innerHTML = '';
+    Array.from(vehicleDataMap.keys()).sort().forEach(num => {
         const option = document.createElement('option');
         option.value = num;
         datalist.appendChild(option);
     });
-    document.body.appendChild(datalist);
-    vehicleNumberInput.setAttribute('list', 'vehicleNumbers');
 }
 
-// Calculate opening and closing values for a specific vehicle
-function calculateOpeningClosingValues(vehicleNumber) {
-    openingValue = 0;
-    closingValue = 0;
-    currentVehicleNumber = vehicleNumber;
-    
-    if (!vehicleNumber) {
-        openingValueSpan.textContent = formatFinancial(openingValue);
-        closingValueSpan.textContent = formatFinancial(closingValue);
-        return;
-    }
-    
-    const transactions = vehicleDataMap.get(vehicleNumber) || [];
-    
-    transactions.forEach(transaction => {
-        const amount = parseFloat(transaction.amount) || 0;
-        const year = parseInt(transaction.year);
-        
-        if (!isNaN(year)) {
-            if (year >= 1999 && year <= 2024) {
-                openingValue += amount;
-            }
-            closingValue += amount;
-        }
-    });
-    
-    openingValueSpan.textContent = formatFinancial(openingValue);
-    closingValueSpan.textContent = formatFinancial(closingValue);
-}
-
-// Search transactions by vehicle number
 function searchTransactions() {
     const vehicleNumber = vehicleNumberInput.value.trim();
-    
     if (!vehicleNumber) {
         alert('Please enter a vehicle number');
         return;
     }
-    
+
     if (!vehicleDataMap.has(vehicleNumber)) {
         displayResults([]);
-        calculateOpeningClosingValues(null);
-        alert('No transactions found for vehicle number: ' + vehicleNumber);
+        updateSummaryValues(0, 0, 0, 0);
+        alert('No transactions found for: ' + vehicleNumber);
         return;
     }
-    
+
+    currentVehicleNumber = vehicleNumber;
     const transactions = vehicleDataMap.get(vehicleNumber);
     displayResults(transactions);
-    calculateOpeningClosingValues(vehicleNumber);
+    calculateOpeningClosingValues(transactions);
 }
 
-// Display results in the table
+function calculateOpeningClosingValues(transactions) {
+    openingValue = 0;
+    closingValue = 0;
+    
+    transactions.forEach(t => {
+        const amount = parseFloat(t.amount) || 0;
+        const year = parseInt(t.year);
+        
+        if (!isNaN(year)) {
+            if (year >= 1999 && year <= 2024) openingValue += amount;
+            closingValue += amount;
+        }
+    });
+    
+    updateSummaryValues(
+        transactions.length,
+        transactions.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0),
+        openingValue,
+        closingValue
+    );
+}
+
+function updateSummaryValues(totalTransactions, totalAmount, opening, closing) {
+    totalTransactionsSpan.textContent = totalTransactions;
+    totalAmountSpan.textContent = formatFinancial(totalAmount);
+    openingValueSpan.textContent = formatFinancial(opening);
+    closingValueSpan.textContent = formatFinancial(closing);
+}
+
 function displayResults(results) {
     resultsTable.innerHTML = '';
     
-    if (results.length === 0) {
+    if (!results.length) {
         const row = resultsTable.insertRow();
         const cell = row.insertCell();
         cell.colSpan = 5;
         cell.textContent = 'No transactions found';
         cell.className = 'no-results';
-        
-        totalTransactionsSpan.textContent = '0';
-        totalAmountSpan.textContent = '0.00';
         return;
     }
     
-    let totalAmount = 0;
-    
-    results.forEach(transaction => {
+    results.forEach(t => {
         const row = resultsTable.insertRow();
-        row.setAttribute('data-year', transaction.year);
-        row.setAttribute('data-description', transaction.description);
-        row.setAttribute('data-amount', transaction.amount);
+        row.setAttribute('data-year', t.year);
+        row.setAttribute('data-description', t.description);
+        row.setAttribute('data-amount', t.amount);
         
-        row.insertCell().textContent = transaction.year || '';
-        row.insertCell().textContent = transaction.poNumber || '';
-        row.insertCell().textContent = transaction.site || '';
-        row.insertCell().textContent = transaction.description || '';
+        row.insertCell().textContent = t.year || '';
+        row.insertCell().textContent = t.poNumber || '';
+        row.insertCell().textContent = t.site || '';
+        row.insertCell().textContent = t.description || '';
         
         const amountCell = row.insertCell();
-        amountCell.textContent = formatFinancial(transaction.amount);
+        amountCell.textContent = formatFinancial(t.amount);
         amountCell.className = 'financial';
-        
-        totalAmount += parseFloat(transaction.amount) || 0;
     });
     
-    totalTransactionsSpan.textContent = results.length;
-    totalAmountSpan.textContent = formatFinancial(totalAmount);
+    filterResults();
 }
 
-// Filter results based on year and description
 function filterResults() {
     const year = yearFilter.value;
     const description = descriptionFilter.value.trim().toLowerCase();
     
-    const rows = Array.from(resultsTable.getElementsByTagName('tr')).filter(row => !row.classList.contains('total-row'));
+    const rows = resultsTable.rows;
     let visibleCount = 0;
-    let totalAmount = 0;
+    let filteredAmount = 0;
     
     for (let row of rows) {
         const rowYear = row.getAttribute('data-year');
-        const rowDescription = row.getAttribute('data-description').toLowerCase();
+        const rowDesc = row.getAttribute('data-description').toLowerCase();
         const rowAmount = parseFloat(row.getAttribute('data-amount')) || 0;
         
-        const yearMatch = !year || rowYear === year;
-        const descriptionMatch = !description || rowDescription.includes(description);
+        const showRow = (!year || rowYear === year) && 
+                       (!description || rowDesc.includes(description));
         
-        if (yearMatch && descriptionMatch) {
-            row.style.display = '';
+        row.style.display = showRow ? '' : 'none';
+        if (showRow) {
             visibleCount++;
-            totalAmount += rowAmount;
-        } else {
-            row.style.display = 'none';
+            filteredAmount += rowAmount;
         }
     }
     
-    // Update total row
-    const totalRow = resultsTable.querySelector('.total-row');
-    if (totalRow) {
-        const totalCell = totalRow.cells[4];
-        totalCell.textContent = formatFinancial(totalAmount);
-    }
-    
-    totalTransactionsSpan.textContent = visibleCount;
-    totalAmountSpan.textContent = formatFinancial(totalAmount);
+    updateSummaryValues(visibleCount, filteredAmount, openingValue, closingValue);
 }
 
-// Get currently filtered transactions from the table
-function getFilteredTransactions() {
-    const rows = resultsTable.getElementsByTagName('tr');
-    const filteredTransactions = [];
-    
-    for (let row of rows) {
-        if (row.style.display !== 'none') {
-            filteredTransactions.push({
-                year: row.getAttribute('data-year'),
-                poNumber: row.cells[1].textContent,
-                site: row.cells[2].textContent,
-                description: row.getAttribute('data-description'),
-                amount: row.getAttribute('data-amount')
-            });
-        }
-    }
-    
-    return filteredTransactions;
+function clearFilters() {
+    yearFilter.value = '';
+    descriptionFilter.value = '';
+    filterResults();
 }
 
-// Generate yearly summary for a vehicle
-function generateYearlySummary(vehicleNumber) {
-    if (!vehicleNumber || !vehicleDataMap.has(vehicleNumber)) return [];
-    
-    const transactions = vehicleDataMap.get(vehicleNumber);
-    const yearlySummary = {};
-    
-    transactions.forEach(transaction => {
-        const year = transaction.year;
-        const amount = parseFloat(transaction.amount) || 0;
-        
-        if (year) {
-            if (!yearlySummary[year]) {
-                yearlySummary[year] = 0;
-            }
-            yearlySummary[year] += amount;
-        }
-    });
-    
-    return Object.entries(yearlySummary)
-        .map(([year, amount]) => ({ year, amount }))
-        .sort((a, b) => a.year - b.year);
-}
-
-// Print report function
 function printReport() {
     if (!currentVehicleNumber) {
         alert('Please search for a vehicle first');
@@ -618,11 +528,52 @@ function printReport() {
                         <button onclick="window.close()" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">Close Window</button>
                     </div>
                 </div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                        }, 200);
+                    };
+                </script>
             </body>
         </html>
     `);
     printWindow.document.close();
 }
 
-// Initialize the app when the page loads
+function getFilteredTransactions() {
+    const transactions = [];
+    const rows = resultsTable.rows;
+    
+    for (let row of rows) {
+        if (row.style.display !== 'none') {
+            transactions.push({
+                year: row.getAttribute('data-year'),
+                poNumber: row.cells[1].textContent,
+                site: row.cells[2].textContent,
+                description: row.getAttribute('data-description'),
+                amount: row.getAttribute('data-amount')
+            });
+        }
+    }
+    
+    return transactions;
+}
+
+function generateYearlySummary() {
+    const summary = {};
+    const transactions = vehicleDataMap.get(currentVehicleNumber) || [];
+    
+    transactions.forEach(t => {
+        if (t.year) {
+            summary[t.year] = (summary[t.year] || 0) + (parseFloat(t.amount) || 0);
+        }
+    });
+    
+    return Object.entries(summary)
+        .map(([year, amount]) => ({ year, amount }))
+        .sort((a, b) => a.year - b.year);
+}
+
+// Initialize the app
 document.addEventListener('DOMContentLoaded', init);
