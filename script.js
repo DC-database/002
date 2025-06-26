@@ -412,26 +412,27 @@ function printReport() {
                         color: #333;
                         background-color: #fff;
                     }
+                    @page {
+                        size: auto;
+                        margin: 10mm;
+                    }
                     .container {
                         width: 100%;
-                        max-width: 1200px;
-                        margin: 0 auto;
-                        padding: 20px;
+                        max-width: 100%;
+                        margin: 0;
+                        padding: 10px;
                         box-sizing: border-box;
                     }
                     .header {
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
-                        margin-bottom: 30px;
-                        padding-bottom: 20px;
+                        margin-bottom: 15px;
+                        padding-bottom: 10px;
                         border-bottom: 1px solid #e0e0e0;
                     }
-                    .company-info {
-                        text-align: left;
-                    }
                     .company-name {
-                        font-size: 24px;
+                        font-size: 20px;
                         font-weight: 700;
                         color: #2c3e50;
                         margin: 0;
@@ -440,119 +441,103 @@ function printReport() {
                         font-size: 12px;
                         color: #7f8c8d;
                         margin-top: 5px;
-                        line-height: 1.5;
-                    }
-                    .report-info {
-                        text-align: right;
                     }
                     .report-title {
-                        font-size: 20px;
+                        font-size: 18px;
                         font-weight: 500;
                         color: #2c3e50;
                         margin: 0;
                     }
                     .report-subtitle {
-                        font-size: 16px;
+                        font-size: 14px;
                         color: #7f8c8d;
                         margin-top: 5px;
                     }
                     .report-meta {
                         font-size: 12px;
                         color: #7f8c8d;
-                        margin-top: 10px;
-                        line-height: 1.5;
+                        margin-top: 5px;
                     }
                     .section {
-                        margin-bottom: 30px;
+                        margin-bottom: 15px;
+                        page-break-inside: avoid;
                     }
                     .section-title {
-                        font-size: 18px;
+                        font-size: 16px;
                         font-weight: 500;
                         color: #2c3e50;
-                        margin-bottom: 15px;
+                        margin-bottom: 10px;
                         padding-bottom: 5px;
                         border-bottom: 1px solid #e0e0e0;
                     }
                     table {
                         width: 100%;
                         border-collapse: collapse;
-                        margin-bottom: 20px;
-                        font-size: 14px;
+                        font-size: 10pt;
+                        page-break-inside: auto;
+                    }
+                    th, td {
+                        padding: 6px 4px;
+                        border: 1px solid #ddd;
                     }
                     th {
                         background-color: #3498db;
                         color: white;
                         font-weight: 500;
-                        padding: 12px 8px;
-                        text-align: left;
-                    }
-                    td {
-                        padding: 10px 8px;
-                        border-bottom: 1px solid #e0e0e0;
-                    }
-                    tr:hover {
-                        background-color: #f5f5f5;
                     }
                     .financial {
                         text-align: right;
                         font-family: 'Roboto Mono', monospace;
-                        font-weight: 500;
                     }
                     .summary-grid {
                         display: grid;
                         grid-template-columns: repeat(4, 1fr);
-                        gap: 15px;
-                        margin-bottom: 20px;
+                        gap: 10px;
+                        margin-bottom: 15px;
                     }
                     .summary-item {
                         background-color: #f8f9fa;
-                        border-radius: 5px;
-                        padding: 15px;
+                        border-radius: 4px;
+                        padding: 10px;
                     }
                     .summary-label {
-                        font-size: 13px;
-                        color: #7f8c8d;
-                        margin-bottom: 5px;
-                    }
-                    .summary-value {
-                        font-size: 18px;
-                        font-weight: 500;
-                        color: #2c3e50;
-                    }
-                    .total-row {
-                        font-weight: 500;
-                        background-color: #f8f9fa;
-                    }
-                    .footer {
-                        margin-top: 40px;
-                        padding-top: 20px;
-                        border-top: 1px solid #e0e0e0;
                         font-size: 12px;
                         color: #7f8c8d;
+                    }
+                    .summary-value {
+                        font-size: 16px;
+                        font-weight: 500;
+                    }
+                    .total-row {
+                        font-weight: 700;
+                        background-color: #f0f7ff;
+                    }
+                    .footer {
+                        margin-top: 20px;
+                        padding-top: 10px;
+                        border-top: 1px solid #e0e0e0;
+                        font-size: 11px;
+                        color: #7f8c8d;
                         text-align: center;
-                        line-height: 1.5;
                     }
                     @media print {
                         body {
                             padding: 0;
-                        }
-                        .no-print {
-                            display: none;
-                        }
-                        .section {
-                            page-break-inside: avoid;
+                            zoom: 0.9;
                         }
                         * {
                             -webkit-print-color-adjust: exact;
                             print-color-adjust: exact;
-                            color-adjust: exact;
                         }
                         th {
                             background-color: #3498db !important;
                             color: white !important;
                         }
-                        .summary-item {
-                            background-color: #f8f9fa !important;
+                        .section {
+                            page-break-inside: avoid;
+                        }
+                        tr {
+                            page-break-inside: avoid;
                         }
                     }
                 </style>
@@ -655,26 +640,12 @@ function printReport() {
                         <p>Confidential - For internal use only</p>
                         <p>Page 1 of 1 | Generated by Vehicle Transaction System</p>
                     </div>
-                    
-                    <div class="no-print" style="margin-top: 20px; text-align: center;">
-                        <button onclick="window.print()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">Print Report</button>
-                        <button onclick="window.close()" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">Close Window</button>
-                    </div>
                 </div>
-                <script>
-                    window.onload = function() {
-                        setTimeout(function() {
-                            window.print();
-                        }, 200);
-                    };
-                </script>
             </body>
         </html>
     `);
     printWindow.document.close();
-}
-
-function getFilteredTransactions() {
+}function getFilteredTransactions() {
     const transactions = [];
     const rows = resultsTable.rows;
     
@@ -888,7 +859,7 @@ function downloadSummaryCSV() {
 }
 
 function printSummaryReport() {
-    const printWindow = window.open('', '_blank', 'width=1200,height=800');
+    const printWindow = window.open('', '_blank');
     const now = new Date();
     const formattedDate = now.toLocaleDateString('en-US', { 
         weekday: 'long', 
@@ -909,28 +880,33 @@ function printSummaryReport() {
                     body { 
                         font-family: 'Roboto', sans-serif; 
                         margin: 0; 
-                        padding: 20px; 
+                        padding: 0; 
                         color: #333;
+                    }
+                    @page {
+                        size: auto;
+                        margin: 10mm;
+                    }
+                    .container {
+                        width: 100%;
+                        padding: 10px;
                     }
                     .header {
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
-                        margin-bottom: 30px;
-                        padding-bottom: 20px;
+                        margin-bottom: 15px;
+                        padding-bottom: 10px;
                         border-bottom: 1px solid #e0e0e0;
                     }
-                    .company-info {
-                        text-align: left;
-                    }
                     .company-name {
-                        font-size: 24px;
+                        font-size: 20px;
                         font-weight: 700;
                         color: #2c3e50;
                         margin: 0;
                     }
                     .report-title {
-                        font-size: 20px;
+                        font-size: 18px;
                         font-weight: 500;
                         color: #2c3e50;
                         margin: 0;
@@ -943,13 +919,11 @@ function printSummaryReport() {
                     table {
                         width: 100%;
                         border-collapse: collapse;
-                        margin-bottom: 20px;
-                        font-size: 12px;
+                        font-size: 10pt;
                     }
                     th, td {
-                        padding: 10px 8px;
+                        padding: 6px 4px;
                         border: 1px solid #ddd;
-                        text-align: left;
                     }
                     th {
                         background-color: #3498db;
@@ -968,19 +942,17 @@ function printSummaryReport() {
                         background-color: #f0f7ff;
                     }
                     .footer {
-                        margin-top: 30px;
-                        padding-top: 15px;
+                        margin-top: 15px;
+                        padding-top: 10px;
                         border-top: 1px solid #ddd;
                         text-align: center;
-                        font-size: 12px;
+                        font-size: 11px;
                         color: #777;
                     }
                     @media print {
-                        @page {
-                            size: landscape;
-                        }
                         body {
-                            padding: 10px;
+                            padding: 0;
+                            zoom: 0.9;
                         }
                         * {
                             -webkit-print-color-adjust: exact;
@@ -990,103 +962,76 @@ function printSummaryReport() {
                             background-color: #3498db !important;
                             color: white !important;
                         }
-			
-                    }
-			.action-buttons {
-                        margin: 20px 0;
-                        text-align: center;
-                    }
-                    .action-button {
-                        padding: 10px 20px;
-                        margin: 0 10px;
-                        border: none;
-                        border-radius: 4px;
-                        font-weight: bold;
-                        cursor: pointer;
-                        font-size: 16px;
-                    }
-                    .print-button {
-                        background-color: #3498db;
-                        color: white;
-                    }
-                    .close-button {
-                        background-color: #e74c3c;
-                        color: white;
+                        .year-header {
+                            background-color: #e0e7ff !important;
+                        }
+                        .total-row {
+                            background-color: #f0f7ff !important;
+                        }
                     }
                 </style>
             </head>
             <body>
-                <div class="header">
-                    <div class="company-info">
-                        <h1 class="company-name">IBA Trading & Contracting & Transportation WLL</h1>
-                        <div class="report-meta">C-Ring Road, Building No: 223, P.O.Box-15, Doha-Qatar</div>
+                <div class="container">
+                    <div class="header">
+                        <div class="company-info">
+                            <h1 class="company-name">IBA Trading & Contracting & Transportation WLL</h1>
+                            <div class="report-meta">C-Ring Road, Building No: 223, P.O.Box-15, Doha-Qatar</div>
+                        </div>
+                        <div>
+                            <h2 class="report-title">Vehicle Transaction Summary Report</h2>
+                            <div class="report-meta">Generated: ${formattedDate}</div>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="report-title">Vehicle Transaction Summary Report</h2>
-                        <div class="report-meta">Generated: ${formattedDate}</div>
-                    </div>
-                </div>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Plate No.</th>
-                            <th>Type</th>
-                            <th>Brand</th>
-                            <th>Driver</th>
-                            <th class="year-header">2020</th>
-                            <th class="year-header">2021</th>
-                            <th class="year-header">2022</th>
-                            <th class="year-header">2023</th>
-                            <th class="year-header">2024</th>
-                            <th class="year-header">2025</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${vehicleSummaryData.map(vehicle => `
+                    
+                    <table>
+                        <thead>
                             <tr>
-                                <td>${vehicle.plate}</td>
-                                <td>${vehicle.type}</td>
-                                <td>${vehicle.brand}</td>
-                                <td>${vehicle.driver || 'No Driver'}</td>
-                                <td class="financial">${formatFinancial(vehicle[2020])}</td>
-                                <td class="financial">${formatFinancial(vehicle[2021])}</td>
-                                <td class="financial">${formatFinancial(vehicle[2022])}</td>
-                                <td class="financial">${formatFinancial(vehicle[2023])}</td>
-                                <td class="financial">${formatFinancial(vehicle[2024])}</td>
-                                <td class="financial">${formatFinancial(vehicle[2025])}</td>
-                                <td class="financial">${formatFinancial(vehicle.total)}</td>
+                                <th>Plate No.</th>
+                                <th>Type</th>
+                                <th>Brand</th>
+                                <th>Driver</th>
+                                <th class="year-header">2020</th>
+                                <th class="year-header">2021</th>
+                                <th class="year-header">2022</th>
+                                <th class="year-header">2023</th>
+                                <th class="year-header">2024</th>
+                                <th class="year-header">2025</th>
+                                <th>Total</th>
                             </tr>
-                        `).join('')}
-                        <tr class="total-row">
-                            <td colspan="4"><strong>GRAND TOTAL</strong></td>
-                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2020] || 0), 0))}</strong></td>
-                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2021] || 0), 0))}</strong></td>
-                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2022] || 0), 0))}</strong></td>
-                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2023] || 0), 0))}</strong></td>
-                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2024] || 0), 0))}</strong></td>
-                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2025] || 0), 0))}</strong></td>
-                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + v.total, 0))}</strong></td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div class="footer">
-                    <p>Confidential - For internal use only | Page 1 of 1</p>
-                </div>
-
-                
-                <script>
-                    window.onload = function() {
-                        setTimeout(function() {
-                            window.print();
-                        }, 200);
-                    };
-                </script>
-            <div class="action-buttons">
-                    <button class="action-button print-button" onclick="window.print()">Print Report</button>
-                    <button class="action-button close-button" onclick="window.close()">Close Window</button>
+                        </thead>
+                        <tbody>
+                            ${vehicleSummaryData.map(vehicle => `
+                                <tr>
+                                    <td>${vehicle.plate}</td>
+                                    <td>${vehicle.type}</td>
+                                    <td>${vehicle.brand}</td>
+                                    <td>${vehicle.driver || 'No Driver'}</td>
+                                    <td class="financial">${formatFinancial(vehicle[2020])}</td>
+                                    <td class="financial">${formatFinancial(vehicle[2021])}</td>
+                                    <td class="financial">${formatFinancial(vehicle[2022])}</td>
+                                    <td class="financial">${formatFinancial(vehicle[2023])}</td>
+                                    <td class="financial">${formatFinancial(vehicle[2024])}</td>
+                                    <td class="financial">${formatFinancial(vehicle[2025])}</td>
+                                    <td class="financial">${formatFinancial(vehicle.total)}</td>
+                                </tr>
+                            `).join('')}
+                            <tr class="total-row">
+                                <td colspan="4"><strong>GRAND TOTAL</strong></td>
+                                <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2020] || 0), 0))}</strong></td>
+                                <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2021] || 0), 0))}</strong></td>
+                                <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2022] || 0), 0))}</strong></td>
+                                <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2023] || 0), 0))}</strong></td>
+                                <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2024] || 0), 0))}</strong></td>
+                                <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2025] || 0), 0))}</strong></td>
+                                <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + v.total, 0))}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="footer">
+                        <p>Confidential - For internal use only | Page 1 of 1</p>
+                    </div>
                 </div>
             </body>
         </html>
