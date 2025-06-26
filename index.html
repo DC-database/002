@@ -3,72 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vehicle Transaction Report</title>
+    <title>Vehicle Transaction Reports</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Vehicle Transaction Report</h1>
-        
-        <div id="loadingIndicator" class="loading-indicator">
-            <div class="spinner"></div>
-            <p>Loading vehicle data...</p>
-        </div>
-        
-        <div class="filters">
-            <div class="search-box">
-                <input type="text" id="vehicleNumber" placeholder="Enter vehicle number" list="vehicleNumbers">
-                <button id="searchBtn">Search</button>
+        <header>
+            <div class="logo">
+                <i class="fas fa-car"></i>
+                <h1>Vehicle Transaction Reports</h1>
             </div>
-            
-            <div class="filter-controls">
-                <select id="yearFilter">
-                    <option value="">All Years</option>
-                </select>
-                <input type="text" id="descriptionFilter" placeholder="Filter by description">
-                <button id="clearBtn">Clear</button>
-                <button id="printBtn" class="print-btn">Print</button>
+            <div class="report-info">
+                <p id="reportDate">Loading date...</p>
             </div>
+        </header>
+
+        <div class="report-selector">
+            <button id="summaryReportBtn" class="report-btn active">
+                <i class="fas fa-list"></i> Vehicle Summary Report
+            </button>
+            <button id="singleReportBtn" class="report-btn">
+                <i class="fas fa-file-alt"></i> Single Vehicle Report
+            </button>
         </div>
-        
-        <div class="results">
-            <div class="summary">
-                <h2>Summary</h2>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <span>Transactions</span>
-                        <span id="totalTransactions">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Amount</span>
-                        <span id="totalAmount">0.00</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Opening Value</span>
-                        <span id="openingValue">0.00</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Closing Value</span>
-                        <span id="closingValue">0.00</span>
-                    </div>
+
+        <!-- Vehicle Summary Report Section -->
+        <section id="summaryReport" class="report-section active">
+            <div class="summary-report-header">
+                <h2><i class="fas fa-table"></i> Vehicle Transaction Summary</h2>
+                <div class="summary-controls">
+                    <button id="downloadSummaryBtn" class="download-btn">
+                        <i class="fas fa-download"></i> Download CSV
+                    </button>
+                    <button id="printSummaryBtn" class="print-btn">
+                        <i class="fas fa-print"></i> Print Report
+                    </button>
                 </div>
             </div>
-            
+
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <h3>Total Vehicles</h3>
+                    <p id="totalVehicles">0</p>
+                </div>
+                <div class="summary-item">
+                    <h3>Total Amount (2023)</h3>
+                    <p id="total2023">0.00</p>
+                </div>
+                <div class="summary-item">
+                    <h3>Highest Spending Vehicle</h3>
+                    <p id="highestSpending">N/A</p>
+                </div>
+                <div class="summary-item">
+                    <h3>Last Updated</h3>
+                    <p id="lastUpdated">Just now</p>
+                </div>
+            </div>
+
             <div class="table-container">
-                <table id="resultsTable">
+                <table id="summaryTable">
                     <thead>
                         <tr>
-                            <th>Year</th>
-                            <th>PO #</th>
-                            <th>Site</th>
-                            <th>Description</th>
-                            <th>Amount</th>
+                            <th>Plate No.</th>
+                            <th>Type</th>
+                            <th>Brand</th>
+                            <th>Driver</th>
+                            <th class="year-header">2020</th>
+                            <th class="year-header">2021</th>
+                            <th class="year-header">2022</th>
+                            <th class="year-header">2023</th>
+                            <th class="year-header">2024</th>
+                            <th class="year-header">2025</th>
+                            <th>Total</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody id="summaryTableBody">
+                        <!-- Data will be populated here -->
+                    </tbody>
                 </table>
             </div>
-        </div>
+        </section>
+
+        <!-- Single Vehicle Report Section -->
+        <section id="singleReport" class="report-section">
+            <div id="loadingIndicator" class="loading-indicator">
+                <div class="spinner"></div>
+                <p>Loading vehicle data...</p>
+            </div>
+            
+            <div class="filters" style="display: none;">
+    <div class="search-box">
+        <input type="text" id="vehicleNumber" placeholder="Enter vehicle number" list="vehicleNumbers">
+        <button id="searchBtn"><i class="fas fa-search"></i> Search</button>
+    </div>
+    
+    <div class="filter-controls">
+        <select id="yearFilter">
+            <option value="">All Years</option>
+        </select>
+        <input type="text" id="descriptionFilter" placeholder="Filter by description">
+        <button id="clearBtn"><i class="fas fa-times"></i> Clear</button>
+        <button id="printBtn" class="print-btn"><i class="fas fa-print"></i> Print</button>
+    </div>
+</div>
+            
+            <div class="results" style="display: none;">
+                <div class="summary">
+                    <h2>Summary</h2>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span>Transactions</span>
+                            <span id="totalTransactions">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Total Amount</span>
+                            <span id="totalAmount">0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Opening Value</span>
+                            <span id="openingValue">0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Closing Value</span>
+                            <span id="closingValue">0.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>PO #</th>
+                                <th>Site</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>IBA Trading & Contracting & Transportation WLL | System Generated Report</p>
+            <p id="currentDate"></p>
+        </footer>
     </div>
 
     <datalist id="vehicleNumbers"></datalist>

@@ -1,6 +1,7 @@
 // Global variables
 let allData = [];
 let vehicleDataMap = new Map();
+let vehicleSummaryData = [];
 let openingValue = 0;
 let closingValue = 0;
 let currentVehicleNumber = '';
@@ -21,13 +22,129 @@ const totalAmountSpan = document.getElementById('totalAmount');
 const openingValueSpan = document.getElementById('openingValue');
 const closingValueSpan = document.getElementById('closingValue');
 
+// New elements for summary report
+const summaryReportSection = document.getElementById('summaryReport');
+const singleReportSection = document.getElementById('singleReport');
+const summaryReportBtn = document.getElementById('summaryReportBtn');
+const singleReportBtn = document.getElementById('singleReportBtn');
+const summaryTableBody = document.getElementById('summaryTableBody');
+const totalVehiclesSpan = document.getElementById('totalVehicles');
+const total2023Span = document.getElementById('total2023');
+const highestSpendingSpan = document.getElementById('highestSpending');
+const lastUpdatedSpan = document.getElementById('lastUpdated');
+const downloadSummaryBtn = document.getElementById('downloadSummaryBtn');
+const printSummaryBtn = document.getElementById('printSummaryBtn');
+const reportDateSpan = document.getElementById('reportDate');
+const currentDateSpan = document.getElementById('currentDate');
+
+// Book7.csv data (converted to array)
+const book7Data = [
+    {plate: "4735", type: "RAM", brand: "Dodge", driver: "Eng. Bara"},
+    {plate: "4896", type: "F150", brand: "Ford", driver: "No Driver"},
+    {plate: "13890", type: "TRAILER BODY", brand: "MERCEDES", driver: "Tajbir singh"},
+    {plate: "17745", type: "SHOVEL CRANE", brand: "CATEPILAR", driver: "Ranjit"},
+    {plate: "24004", type: "SHOVEL CRANE", brand: "CATEPILAR", driver: "Karam Husen"},
+    {plate: "29391", type: "PICK UP", brand: "NISSAN", driver: "Mohamad Islam"},
+    {plate: "31062", type: "LOADER", brand: "KUMATSO", driver: "Suman Ali"},
+    {plate: "31107", type: "WATER TANKER", brand: "TATA", driver: "Ranjit Singh"},
+    {plate: "32218", type: "SMALL BOBCAT", brand: "CATERPILAR", driver: "Harun"},
+    {plate: "33930", type: "SHOVEL CRANE", brand: "CATERPILLAR", driver: "Ranjit"},
+    {plate: "34026", type: "BIG BOBCAT", brand: "CATERPILAR", driver: ""},
+    {plate: "35237", type: "6 WHEEL (3 TON)", brand: "MITSUBISHI", driver: "Harendar Khan"},
+    {plate: "36588", type: "LOADER", brand: "KUMATSO", driver: "Mir Akbar"},
+    {plate: "37481", type: "TRAILER", brand: "MERCEDES", driver: "Arbab Khan"},
+    {plate: "37510", type: "TRAILER", brand: "MERCEDES", driver: "Charanjit"},
+    {plate: "47054", type: "SHOVEL (TELEHANDLER)", brand: "JCB", driver: "Gul Rehman"},
+    {plate: "47055", type: "SHOVEL (TELEHANDLER)", brand: "JCB", driver: "Karam Husen"},
+    {plate: "47524", type: "BIG BUS -", brand: "ASHOK LEYLAND", driver: "Basanta"},
+    {plate: "49921", type: "SMALL BOBCAT", brand: "JCB", driver: "Imran"},
+    {plate: "51421", type: "PICK UP", brand: "NISSAN", driver: "Kotika Aruna"},
+    {plate: "56551", type: "MOBILE CRANE", brand: "XCMG", driver: "Sharif Khan"},
+    {plate: "59150", type: "PICK UP", brand: "TOYOTA", driver: "Azam Khan"},
+    {plate: "66588", type: "BOBCAT (small)", brand: "Bobcat", driver: "Rajeeb"},
+    {plate: "66589", type: "BOBCAT (small)", brand: "Bobcat", driver: "Naeem"},
+    {plate: "74186", type: "SALOON (TIIDA)", brand: "NISSAN", driver: "Asif Husain"},
+    {plate: "79723", type: "TRAILER HEAD+TRAILER", brand: "MERCEDES", driver: "Ansari"},
+    {plate: "104498", type: "BIG BUS", brand: "ASHOK LEYLAND", driver: "Janab Hussein"},
+    {plate: "105086", type: "PICK UP", brand: "MITSUBISHI", driver: "Ansari"},
+    {plate: "117325", type: "BIG BUS", brand: "TATA", driver: ""},
+    {plate: "125790", type: "BIG BUS", brand: "ASHOK LEYLAND", driver: ""},
+    {plate: "132981", type: "6 WHEEL (3 TON)", brand: "MITSUBISHI", driver: "Tajbir singh"},
+    {plate: "134037", type: "PICK UP", brand: "TOYOTA", driver: "Govindaraj"},
+    {plate: "134494", type: "6 WHEEL (3 TON)", brand: "MITSUBISHI", driver: "Janab Hussein"},
+    {plate: "145057", type: "PICK UP", brand: "NISSAN", driver: ""},
+    {plate: "145759", type: "TRAILER HEAD", brand: "MERCEDES", driver: "Naveed Khan"},
+    {plate: "167502", type: "PICK UP", brand: "NISSAN", driver: "Asrar"},
+    {plate: "167503", type: "PICK UP", brand: "NISSAN", driver: "Nosher Khan"},
+    {plate: "180212", type: "BIG BUS", brand: "ASHOK LEYLAND", driver: "Arbab Khan"},
+    {plate: "191684", type: "PICK UP", brand: "TOYOTA", driver: "Hassan Abdulla"},
+    {plate: "192934", type: "SALOON (TIIDA)", brand: "NISSAN", driver: "Sakir"},
+    {plate: "192955", type: "PICK UP", brand: "TOYOTA", driver: "Halimi"},
+    {plate: "193120", type: "PICK UP", brand: "TOYOTA", driver: "Zahid Khan"},
+    {plate: "206713", type: "MINI BUS (26 PASSENGER)", brand: "TOYOTA", driver: "Balram"},
+    {plate: "220190", type: "FORD F150", brand: "FORD", driver: "Khaled Soltan"},
+    {plate: "238490", type: "MINI BUS (30 PASSENGER)", brand: "NISSAN", driver: "Tajbir singh"},
+    {plate: "250117", type: "BIG BUS", brand: "ASHOK LEYLAND", driver: "Shahid Khan"},
+    {plate: "254081", type: "BIG BUS - NEW", brand: "TATA", driver: "Arbab Khan"},
+    {plate: "254258", type: "BIG BUS - NEW", brand: "TATA", driver: "Harendar Khan"},
+    {plate: "262203", type: "PICK UP", brand: "TOYOTA", driver: "Mostafa Campboss"},
+    {plate: "281839", type: "TRAILER", brand: "MERCEDES", driver: "Arbab Khan"},
+    {plate: "314419", type: "PICK UP", brand: "TOYOTA", driver: "Govindaraj"},
+    {plate: "318505", type: "MINI BUS", brand: "TOYOTA", driver: "Prasad"},
+    {plate: "345468", type: "STATION WAGON (CRUISER)", brand: "TOYOTA", driver: "Abdurahman Yousry"},
+    {plate: "456102", type: "SALOON (TIIDA)", brand: "NISSAN", driver: "Nematulla"},
+    {plate: "456103", type: "SALOON (TIIDA)", brand: "NISSAN", driver: "Mr. Jose"},
+    {plate: "458630", type: "SALOON (TIIDA)", brand: "NISSAN", driver: "Nematolla"},
+    {plate: "507521", type: "STATION WAGON (X-TRAIL)", brand: "NISSAN", driver: "Hassan Abdulla"},
+    {plate: "526051", type: "SALOON (TIIDA)", brand: "NISSAN", driver: "Micheal"},
+    {plate: "672193", type: "PRADO LAND CRUISER", brand: "TOYOTA", driver: "Khaled Soltan"},
+    {plate: "751056", type: "HATCHBACK(TIIDA)", brand: "NISSAN", driver: "MD SAKIR HUSSAIN"},
+    {plate: "95128", type: "PICK UP", brand: "TOYOTA", driver: "NOSHER KHAN GULAB KHAN"},
+    {plate: "95137", type: "PICK UP", brand: "TOYOTA", driver: "ZAHID KHAN FAIYAZ KHAN-BALRAM"},
+    {plate: "334239", type: "EXPEDITION", brand: "FORD", driver: "MR. ALI ALMUGHRABI"},
+    {plate: "820045", type: "GMC", brand: "YUKON", driver: "MR. MOSTAFA MOHAMED SHENISHN"},
+    {plate: "179713", type: "Truck (Canter)", brand: "MITSUBISHI", driver: "NOOR SHAIB SHAHZAD"},
+    {plate: "279977", type: "Toyota Hilux", brand: "TOYOTA", driver: "DHARMENDRA SINGH RISHIDEV SINGH"},
+    {plate: "317673", type: "Toyota Hilux", brand: "TOYOTA", driver: "SHAHUL HAMEED MOHAMMEDALI"},
+    {plate: "925770", type: "Outlander", brand: "MITSUBISHI", driver: "MOHAMED OTHMAN"},
+    {plate: "102095", type: "TATA BUS 66 SEATER", brand: "TATA", driver: "ARBAB KHAN PIR GUL"},
+    {plate: "173492", type: "TATA BUS 66 SEATER", brand: "TATA", driver: "MOHAMMAD USUF A.KHA"},
+    {plate: "78209", type: "HYUNDAI 5 TON FORKLIFT", brand: "MITSUBISHI", driver: "MOUHASIN ANDUL MAJID"},
+    {plate: "195891", type: "TOYOTA DOUBLE CABIN PICKUP 4X4", brand: "TOYOTA", driver: "ESAM - 26-11-2024- 06:30 PM"},
+    {plate: "220266", type: "TOYOTA DOUBLE CABIN PICKUP 4X4", brand: "TOYOTA", driver: "SAMAD"},
+    {plate: "78409", type: "ROLLER COMPACTOR 3 TON", brand: "JCB", driver: "AQIB - 14-01-2025 169"},
+    {plate: "174186", type: "TIIDA", brand: "NISSAN", driver: "HAFIZ MUHAMMAD ABBAS"},
+    {plate: "698271", type: "TOYOTA RAV", brand: "TOYOTA", driver: "ASIF HUSSEIN"},
+    {plate: "H281840-37510", type: "TRAILER-mercedes", brand: "MERCEDES", driver: "MUFTAH UD DIN PIR KHAN"},
+    {plate: "H281839-37481", type: "TRAILER-mercedes", brand: "MERCEDES", driver: "SUKHDEV SINGHĀ"},
+    {plate: "H145759-13890", type: "TRAILER -mercedes", brand: "MERCEDES", driver: "RANJIT SINGH"},
+    {plate: "281840", type: "Trailer", brand: "MERCEDES", driver: ""}
+];
+
 // Initialize the application
 function init() {
     setupEventListeners();
     loadCSVFromURL();
+    updateDateTime();
+    setInterval(updateDateTime, 60000); // Update time every minute
+}
+
+function updateDateTime() {
+    const now = new Date();
+    const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    reportDateSpan.textContent = now.toLocaleDateString('en-US', options);
+    currentDateSpan.textContent = now.toLocaleDateString('en-US', options);
 }
 
 function setupEventListeners() {
+    // Single vehicle report listeners
     searchBtn.addEventListener('click', searchTransactions);
     printBtn.addEventListener('click', printReport);
     yearFilter.addEventListener('change', filterResults);
@@ -37,6 +154,32 @@ function setupEventListeners() {
     vehicleNumberInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') searchTransactions();
     });
+    
+    // Summary report listeners
+    summaryReportBtn.addEventListener('click', () => {
+        switchReport('summary');
+    });
+    
+    singleReportBtn.addEventListener('click', () => {
+        switchReport('single');
+    });
+    
+    downloadSummaryBtn.addEventListener('click', downloadSummaryCSV);
+    printSummaryBtn.addEventListener('click', printSummaryReport);
+}
+
+function switchReport(type) {
+    if (type === 'summary') {
+        summaryReportSection.classList.add('active');
+        singleReportSection.classList.remove('active');
+        summaryReportBtn.classList.add('active');
+        singleReportBtn.classList.remove('active');
+    } else {
+        summaryReportSection.classList.remove('active');
+        singleReportSection.classList.add('active');
+        summaryReportBtn.classList.remove('active');
+        singleReportBtn.classList.add('active');
+    }
 }
 
 function formatFinancial(num) {
@@ -52,6 +195,7 @@ function loadCSVFromURL() {
         complete: function(results) {
             allData = results.data.filter(row => row['Year']);
             processData(allData);
+            generateVehicleSummary();
             
             filtersSection.style.display = 'block';
             resultsSection.style.display = 'block';
@@ -73,18 +217,7 @@ function processData(data) {
     vehicleDataMap.clear();
     if (!data.length) return;
 
-    const knownVehicleNumbers = [
-        "4735", "4896", "13890", "17745", "24004", "29391", "31062", "31107", "32218", 
-        "33930", "34026", "35237", "36588", "37481", "37510", "47054", "47055", "47524", 
-        "49921", "51421", "56551", "59150", "66588", "66589", "74186", "79723", "104498", 
-        "105086", "117325", "125790", "132981", "134037", "134494", "145057", "145759", 
-        "167502", "167503", "180212", "191684", "192934", "192955", "193120", "206713", 
-        "220190", "238490", "250117", "254081", "254258", "262203", "281839", "314419", 
-        "318505", "345468", "456102", "456103", "458630", "507521", "526051", "672193", 
-        "751056", "95128", "95137", "334239", "820045", "179713", "279977", "317673",
-        "925770", "102095", "173492", "78209", "195891", "220266", "78409", "174186", 
-        "698271", "H281840-37510", "H281839-37481", "H145759-13890", "281840", "238184"
-    ];
+    const knownVehicleNumbers = book7Data.map(item => item.plate);
 
     // Process data and populate vehicleDataMap
     data.forEach(row => {
@@ -573,6 +706,392 @@ function generateYearlySummary() {
     return Object.entries(summary)
         .map(([year, amount]) => ({ year, amount }))
         .sort((a, b) => a.year - b.year);
+}
+
+// Summary report functions
+function generateVehicleSummary() {
+    vehicleSummaryData = book7Data.map(vehicle => {
+        const plate = vehicle.plate;
+        const summary = {
+            plate: plate,
+            type: vehicle.type,
+            brand: vehicle.brand,
+            driver: vehicle.driver,
+            total: 0
+        };
+        
+        // Initialize yearly amounts
+        for (let year = 2020; year <= 2025; year++) {
+            summary[year] = 0;
+        }
+        
+        // Get transactions for this vehicle
+        const transactions = vehicleDataMap.get(plate) || [];
+        
+        // Calculate yearly totals
+        transactions.forEach(transaction => {
+            const year = parseInt(transaction.year);
+            const amount = parseFloat(transaction.amount) || 0;
+            
+            if (year >= 2020 && year <= 2025) {
+                summary[year] += amount;
+                summary.total += amount;
+            }
+        });
+        
+        return summary;
+    });
+    
+    renderSummaryReport();
+}
+
+function renderSummaryReport() {
+    summaryTableBody.innerHTML = '';
+    
+    if (!vehicleSummaryData.length) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 15;
+        cell.textContent = 'No vehicle data available';
+        cell.className = 'no-results';
+        row.appendChild(cell);
+        summaryTableBody.appendChild(row);
+        return;
+    }
+    
+    // Sort by plate number
+    vehicleSummaryData.sort((a, b) => a.plate.localeCompare(b.plate));
+    
+    let total2023 = 0;
+    let highestSpending = { plate: '', amount: 0 };
+    let grandTotal = 0;
+    const yearTotals = {};
+    
+    // Initialize year totals
+    for (let year = 2020; year <= 2025; year++) {
+        yearTotals[year] = 0;
+    }
+    
+    // Populate table rows
+    vehicleSummaryData.forEach(vehicle => {
+        const row = document.createElement('tr');
+        
+        // Plate
+        const plateCell = document.createElement('td');
+        plateCell.textContent = vehicle.plate;
+        row.appendChild(plateCell);
+        
+        // Type
+        const typeCell = document.createElement('td');
+        typeCell.textContent = vehicle.type;
+        row.appendChild(typeCell);
+        
+        // Brand
+        const brandCell = document.createElement('td');
+        brandCell.textContent = vehicle.brand;
+        row.appendChild(brandCell);
+        
+        // Driver
+        const driverCell = document.createElement('td');
+        driverCell.textContent = vehicle.driver || 'No Driver';
+        row.appendChild(driverCell);
+        
+        // Yearly amounts
+        for (let year = 2020; year <= 2025; year++) {
+            const amount = vehicle[year] || 0;
+            const amountCell = document.createElement('td');
+            amountCell.className = 'financial';
+            amountCell.textContent = formatFinancial(amount);
+            row.appendChild(amountCell);
+            
+            // Add to year totals
+            yearTotals[year] += amount;
+            
+            // Track 2023 total
+            if (year === 2023) {
+                total2023 += amount;
+            }
+        }
+        
+        // Total
+        const totalCell = document.createElement('td');
+        totalCell.className = 'financial';
+        totalCell.textContent = formatFinancial(vehicle.total);
+        row.appendChild(totalCell);
+        
+        grandTotal += vehicle.total;
+        
+        // Track highest spending vehicle
+        if (vehicle.total > highestSpending.amount) {
+            highestSpending = {
+                plate: vehicle.plate,
+                amount: vehicle.total
+            };
+        }
+        
+        summaryTableBody.appendChild(row);
+    });
+    
+    // Add total row
+    const totalRow = document.createElement('tr');
+    totalRow.className = 'total-row';
+    
+    totalRow.innerHTML = `
+        <td colspan="4"><strong>GRAND TOTAL</strong></td>
+        <td class="financial"><strong>${formatFinancial(yearTotals[2020])}</strong></td>
+        <td class="financial"><strong>${formatFinancial(yearTotals[2021])}</strong></td>
+        <td class="financial"><strong>${formatFinancial(yearTotals[2022])}</strong></td>
+        <td class="financial"><strong>${formatFinancial(yearTotals[2023])}</strong></td>
+        <td class="financial"><strong>${formatFinancial(yearTotals[2024])}</strong></td>
+        <td class="financial"><strong>${formatFinancial(yearTotals[2025])}</strong></td>
+        <td class="financial"><strong>${formatFinancial(grandTotal)}</strong></td>
+    `;
+    
+    summaryTableBody.appendChild(totalRow);
+    
+    // Update summary boxes
+    totalVehiclesSpan.textContent = vehicleSummaryData.length;
+    total2023Span.textContent = formatFinancial(total2023);
+    highestSpendingSpan.textContent = `${highestSpending.plate} (${formatFinancial(highestSpending.amount)})`;
+    lastUpdatedSpan.textContent = 'Just now';
+}
+
+function downloadSummaryCSV() {
+    let csvContent = "Plate No.,Type,Brand,Driver,2020,2021,2022,2023,2024,2025,Total\n";
+    
+    vehicleSummaryData.forEach(vehicle => {
+        const row = [
+            `"${vehicle.plate}"`,
+            `"${vehicle.type}"`,
+            `"${vehicle.brand}"`,
+            `"${vehicle.driver}"`
+        ];
+        
+        for (let year = 2020; year <= 2025; year++) {
+            row.push(vehicle[year] || 0);
+        }
+        
+        row.push(vehicle.total);
+        
+        csvContent += row.join(',') + '\n';
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "vehicle_summary_report.csv");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function printSummaryReport() {
+    const printWindow = window.open('', '_blank', 'width=1200,height=800');
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Vehicle Summary Report</title>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+                    
+                    body { 
+                        font-family: 'Roboto', sans-serif; 
+                        margin: 0; 
+                        padding: 20px; 
+                        color: #333;
+                    }
+                    .header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 30px;
+                        padding-bottom: 20px;
+                        border-bottom: 1px solid #e0e0e0;
+                    }
+                    .company-info {
+                        text-align: left;
+                    }
+                    .company-name {
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #2c3e50;
+                        margin: 0;
+                    }
+                    .report-title {
+                        font-size: 20px;
+                        font-weight: 500;
+                        color: #2c3e50;
+                        margin: 0;
+                    }
+                    .report-meta {
+                        font-size: 12px;
+                        color: #7f8c8d;
+                        margin-top: 5px;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 20px;
+                        font-size: 12px;
+                    }
+                    th, td {
+                        padding: 10px 8px;
+                        border: 1px solid #ddd;
+                        text-align: left;
+                    }
+                    th {
+                        background-color: #3498db;
+                        color: white;
+                        font-weight: 500;
+                    }
+                    .financial {
+                        text-align: right;
+                    }
+                    .year-header {
+                        background-color: #e0e7ff;
+                        text-align: center;
+                    }
+                    .total-row {
+                        font-weight: 700;
+                        background-color: #f0f7ff;
+                    }
+                    .footer {
+                        margin-top: 30px;
+                        padding-top: 15px;
+                        border-top: 1px solid #ddd;
+                        text-align: center;
+                        font-size: 12px;
+                        color: #777;
+                    }
+                    @media print {
+                        @page {
+                            size: landscape;
+                        }
+                        body {
+                            padding: 10px;
+                        }
+                        * {
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                        }
+                        th {
+                            background-color: #3498db !important;
+                            color: white !important;
+                        }
+			
+                    }
+			.action-buttons {
+                        margin: 20px 0;
+                        text-align: center;
+                    }
+                    .action-button {
+                        padding: 10px 20px;
+                        margin: 0 10px;
+                        border: none;
+                        border-radius: 4px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        font-size: 16px;
+                    }
+                    .print-button {
+                        background-color: #3498db;
+                        color: white;
+                    }
+                    .close-button {
+                        background-color: #e74c3c;
+                        color: white;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="company-info">
+                        <h1 class="company-name">IBA Trading & Contracting & Transportation WLL</h1>
+                        <div class="report-meta">C-Ring Road, Building No: 223, P.O.Box-15, Doha-Qatar</div>
+                    </div>
+                    <div>
+                        <h2 class="report-title">Vehicle Transaction Summary Report</h2>
+                        <div class="report-meta">Generated: ${formattedDate}</div>
+                    </div>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Plate No.</th>
+                            <th>Type</th>
+                            <th>Brand</th>
+                            <th>Driver</th>
+                            <th class="year-header">2020</th>
+                            <th class="year-header">2021</th>
+                            <th class="year-header">2022</th>
+                            <th class="year-header">2023</th>
+                            <th class="year-header">2024</th>
+                            <th class="year-header">2025</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${vehicleSummaryData.map(vehicle => `
+                            <tr>
+                                <td>${vehicle.plate}</td>
+                                <td>${vehicle.type}</td>
+                                <td>${vehicle.brand}</td>
+                                <td>${vehicle.driver || 'No Driver'}</td>
+                                <td class="financial">${formatFinancial(vehicle[2020])}</td>
+                                <td class="financial">${formatFinancial(vehicle[2021])}</td>
+                                <td class="financial">${formatFinancial(vehicle[2022])}</td>
+                                <td class="financial">${formatFinancial(vehicle[2023])}</td>
+                                <td class="financial">${formatFinancial(vehicle[2024])}</td>
+                                <td class="financial">${formatFinancial(vehicle[2025])}</td>
+                                <td class="financial">${formatFinancial(vehicle.total)}</td>
+                            </tr>
+                        `).join('')}
+                        <tr class="total-row">
+                            <td colspan="4"><strong>GRAND TOTAL</strong></td>
+                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2020] || 0), 0))}</strong></td>
+                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2021] || 0), 0))}</strong></td>
+                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2022] || 0), 0))}</strong></td>
+                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2023] || 0), 0))}</strong></td>
+                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2024] || 0), 0))}</strong></td>
+                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + (v[2025] || 0), 0))}</strong></td>
+                            <td class="financial"><strong>${formatFinancial(vehicleSummaryData.reduce((sum, v) => sum + v.total, 0))}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="footer">
+                    <p>Confidential - For internal use only | Page 1 of 1</p>
+                </div>
+
+                
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                        }, 200);
+                    };
+                </script>
+            <div class="action-buttons">
+                    <button class="action-button print-button" onclick="window.print()">Print Report</button>
+                    <button class="action-button close-button" onclick="window.close()">Close Window</button>
+                </div>
+            </body>
+        </html>
+    `);
+    printWindow.document.close();
 }
 
 // Initialize the app
