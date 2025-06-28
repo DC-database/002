@@ -4,42 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vehicle Transaction Reports</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <i class="fas fa-car"></i>
-                <h1>Vehicle Transaction Reports</h1>
-            </div>
-            <div class="report-info">
-                <p id="reportDate">Loading date...</p>
-            </div>
-        </header>
+    <div class="mobile-header">
+        <button class="menu-toggle" aria-label="Menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h1>Vehicle Reports</h1>
+        <div class="header-time" id="currentDate"></div>
+    </div>
 
-        <div class="report-selector">
-            <button id="summaryReportBtn" class="report-btn active">
-                <i class="fas fa-list"></i> Vehicle Summary Report
-            </button>
-            <button id="singleReportBtn" class="report-btn">
-                <i class="fas fa-file-alt"></i> Single Vehicle Report
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>Menu</h2>
+            <button class="close-menu" aria-label="Close menu">
+                <i class="fas fa-times"></i>
             </button>
         </div>
+        <ul>
+            <li>
+                <button id="summaryReportBtn" class="report-btn active">
+                    <i class="fas fa-list"></i> Summary Report
+                </button>
+            </li>
+            <li>
+                <button id="singleReportBtn" class="report-btn">
+                    <i class="fas fa-file-alt"></i> Single Vehicle
+                </button>
+            </li>
+        </ul>
+    </nav>
 
+    <div class="overlay"></div>
+
+    <main class="container">
         <!-- Vehicle Summary Report Section -->
         <section id="summaryReport" class="report-section active">
             <div class="summary-report-header">
-                <h2><i class="fas fa-table"></i> Vehicle Transaction Summary</h2>
-                <div class="summary-controls">
-                    <button id="downloadSummaryBtn" class="download-btn">
-                        <i class="fas fa-download"></i> Download CSV
-                    </button>
-                    <button id="printSummaryBtn" class="print-btn">
-                        <i class="fas fa-print"></i> Print Report
-                    </button>
-                </div>
+                <h2><i class="fas fa-table"></i> Vehicle Summary</h2>
+                <button id="printSummaryBtn" class="print-btn">
+                    <i class="fas fa-print"></i> Print
+                </button>
             </div>
 
             <div class="summary-grid">
@@ -48,16 +55,12 @@
                     <p id="totalVehicles">0</p>
                 </div>
                 <div class="summary-item">
-                    <h3>Total Amount (2023)</h3>
+                    <h3>Total (2023)</h3>
                     <p id="total2023">0.00</p>
                 </div>
                 <div class="summary-item">
-                    <h3>Highest Spending Vehicle</h3>
+                    <h3>Highest Spending</h3>
                     <p id="highestSpending">N/A</p>
-                </div>
-                <div class="summary-item">
-                    <h3>Last Updated</h3>
-                    <p id="lastUpdated">Just now</p>
                 </div>
             </div>
 
@@ -102,7 +105,7 @@
                     <select id="yearFilter">
                         <option value="">All Years</option>
                     </select>
-                    <input type="text" id="descriptionFilter" placeholder="Filter by description">
+                    <input type="text" id="descriptionFilter" placeholder="Filter description">
                     <button id="clearBtn"><i class="fas fa-times"></i> Clear</button>
                     <button id="printBtn" class="print-btn"><i class="fas fa-print"></i> Print</button>
                 </div>
@@ -149,10 +152,10 @@
         </section>
 
         <footer>
-            <p>IBA Trading & Contracting & Transportation WLL | System Generated Report</p>
-            <p id="currentDate"></p>
+            <p>IBA Trading & Transportation WLL</p>
+            <p>System Generated Report</p>
         </footer>
-    </div>
+    </main>
 
     <datalist id="vehicleNumbers"></datalist>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>

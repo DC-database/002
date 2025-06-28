@@ -22,7 +22,7 @@ const totalAmountSpan = document.getElementById('totalAmount');
 const openingValueSpan = document.getElementById('openingValue');
 const closingValueSpan = document.getElementById('closingValue');
 
-// New elements for summary report
+// Summary report elements
 const summaryReportSection = document.getElementById('summaryReport');
 const singleReportSection = document.getElementById('singleReport');
 const summaryReportBtn = document.getElementById('summaryReportBtn');
@@ -32,10 +32,14 @@ const totalVehiclesSpan = document.getElementById('totalVehicles');
 const total2023Span = document.getElementById('total2023');
 const highestSpendingSpan = document.getElementById('highestSpending');
 const lastUpdatedSpan = document.getElementById('lastUpdated');
-const downloadSummaryBtn = document.getElementById('downloadSummaryBtn');
 const printSummaryBtn = document.getElementById('printSummaryBtn');
-const reportDateSpan = document.getElementById('reportDate');
 const currentDateSpan = document.getElementById('currentDate');
+
+// Mobile menu elements
+const menuToggle = document.querySelector('.menu-toggle');
+const closeMenu = document.querySelector('.close-menu');
+const sidebar = document.querySelector('.sidebar');
+const overlay = document.querySelector('.overlay');
 
 // Book7.csv data (converted to array)
 const book7Data = [
@@ -139,11 +143,15 @@ function updateDateTime() {
         hour: '2-digit',
         minute: '2-digit'
     };
-    reportDateSpan.textContent = now.toLocaleDateString('en-US', options);
     currentDateSpan.textContent = now.toLocaleDateString('en-US', options);
 }
 
 function setupEventListeners() {
+    // Mobile menu listeners
+    menuToggle.addEventListener('click', toggleMenu);
+    closeMenu.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);
+    
     // Single vehicle report listeners
     searchBtn.addEventListener('click', searchTransactions);
     printBtn.addEventListener('click', printReport);
@@ -158,14 +166,21 @@ function setupEventListeners() {
     // Summary report listeners
     summaryReportBtn.addEventListener('click', () => {
         switchReport('summary');
+        toggleMenu();
     });
     
     singleReportBtn.addEventListener('click', () => {
         switchReport('single');
+        toggleMenu();
     });
     
-    downloadSummaryBtn.addEventListener('click', downloadSummaryCSV);
     printSummaryBtn.addEventListener('click', printSummaryReport);
+}
+
+function toggleMenu() {
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+    document.body.classList.toggle('no-scroll');
 }
 
 function switchReport(type) {
@@ -645,7 +660,9 @@ function printReport() {
         </html>
     `);
     printWindow.document.close();
-}function getFilteredTransactions() {
+}
+
+function getFilteredTransactions() {
     const transactions = [];
     const rows = resultsTable.rows;
     
@@ -824,38 +841,6 @@ function renderSummaryReport() {
     totalVehiclesSpan.textContent = vehicleSummaryData.length;
     total2023Span.textContent = formatFinancial(total2023);
     highestSpendingSpan.textContent = `${highestSpending.plate} (${formatFinancial(highestSpending.amount)})`;
-    lastUpdatedSpan.textContent = 'Just now';
-}
-
-function downloadSummaryCSV() {
-    let csvContent = "Plate No.,Type,Brand,Driver,2020,2021,2022,2023,2024,2025,Total\n";
-    
-    vehicleSummaryData.forEach(vehicle => {
-        const row = [
-            `"${vehicle.plate}"`,
-            `"${vehicle.type}"`,
-            `"${vehicle.brand}"`,
-            `"${vehicle.driver}"`
-        ];
-        
-        for (let year = 2020; year <= 2025; year++) {
-            row.push(vehicle[year] || 0);
-        }
-        
-        row.push(vehicle.total);
-        
-        csvContent += row.join(',') + '\n';
-    });
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", "vehicle_summary_report.csv");
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 }
 
 function printSummaryReport() {
